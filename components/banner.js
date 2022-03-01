@@ -1,7 +1,10 @@
 import React from "react";
 import styles from "./banner.module.css";
+import { useRouter } from "next/router";
+
 function Banner(props) {
   const { buttonText, handleOnBtnClick } = props;
+
   return (
     <div className={styles.container}>
       <h1 className={styles.title}>
@@ -9,10 +12,11 @@ function Banner(props) {
         <span className={styles.title2}>Shops</span>
       </h1>
       <p className={styles.subTitle}>Discover your local coffee Shops</p>
-      <button className={styles.button} onClick={handleOnBtnClick}>
-        {" "}
-        {buttonText}
-      </button>
+      <div className={styles.buttonWrapper}>
+        <button className={styles.button} onClick={handleOnBtnClick}>
+          {buttonText}
+        </button>
+      </div>
     </div>
   );
 }
