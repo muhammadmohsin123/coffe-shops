@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
-import coffeeStoreData from "../../data/coffee-stores.json";
+
 import Head from "next/head";
 import styles from "../../styles/coffee-store.module.css";
 import Image from "next/image";
@@ -12,7 +12,9 @@ import { fectchCoffeSTores } from "../../lib/coffeSore";
 
 export async function getStaticProps(context) {
   const params = context.params;
+  console.log("params", params);
   const coffeeStores = await fectchCoffeSTores();
+
   return {
     props: {
       coffeeStore: coffeeStores.find(
@@ -27,6 +29,7 @@ export async function getStaticPaths() {
   const paths = coffeeStores.map((item) => ({
     params: { id: item.fsq_id.toString() },
   }));
+  console.log("paths", paths);
   return {
     paths,
     fallback: true, // false or 'blocking'
@@ -42,7 +45,8 @@ function CoffeeStore(props) {
   if (router.isFallback) {
     return <div>Loading....</div>;
   }
-  const { name, location, neighbourhood, imgUrl } = props.coffeeStore;
+  const { name, location, id, imgUrl } = props.coffeeStore;
+  console.log("props.coffeeStore", props.coffeeStore);
   useEffect(async () => {}, []);
   const handleUpvoteButton = () => {
     console.log("up vote");
