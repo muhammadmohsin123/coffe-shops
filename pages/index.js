@@ -8,6 +8,8 @@ import { fectchCoffeSTores } from "../lib/coffeSore";
 import { useEffect } from "react";
 import axios from "axios";
 
+import { useTrackLocation } from "../hooks/use-track-location";
+
 export async function getStaticProps(context) {
   const coffeeStores = await fectchCoffeSTores();
   return {
@@ -18,8 +20,20 @@ export async function getStaticProps(context) {
 }
 
 export default function Home(props) {
+  //Custom hook
+  const { tracLocationHandler, locationErrMsg, latLong, loading } =
+    useTrackLocation();
+
+  useEffect(async () => {
+    const fetchedStores = await fectchCoffeSTores(latLong, 30);
+    console.log("🚀 ~ file: index.js ~ line 30 ~ useEffect ~ fetchedStores", {
+      fetchedStores,
+    });
+  }, [latLong]);
+
   const handleOnBannerBtnClick = () => {
-    console.log(props);
+    tracLocationHandler();
+    console.log("button clicked");
   };
 
   return (
@@ -32,9 +46,10 @@ export default function Home(props) {
 
       <main className={styles.main}>
         <Banner
-          buttonText='View Stores Nearby '
+          buttonText={loading ? "Loading..." : "View Stores Nearby "}
           handleOnBtnClick={handleOnBannerBtnClick}
         />
+        {locationErrMsg && ` Somthing went wrong ${locationErrMsg} `}
         <div className={styles.heroImage}>
           <Image src='/static/hero-image.png' width={700} height={400} />
         </div>

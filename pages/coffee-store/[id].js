@@ -12,9 +12,8 @@ import { fectchCoffeSTores } from "../../lib/coffeSore";
 
 export async function getStaticProps(context) {
   const params = context.params;
-  console.log("params", params);
   const coffeeStores = await fectchCoffeSTores();
-
+  console.log("");
   return {
     props: {
       coffeeStore: coffeeStores.find(
@@ -29,7 +28,6 @@ export async function getStaticPaths() {
   const paths = coffeeStores.map((item) => ({
     params: { id: item.fsq_id.toString() },
   }));
-  console.log("paths", paths);
   return {
     paths,
     fallback: true, // false or 'blocking'
@@ -87,7 +85,7 @@ function CoffeeStore(props) {
             />
             <p className={styles.text}>{location.address}</p>
           </div>
-          {location.neighborhood.length > 0 && (
+          {location.neighborhood?.length > 0 && (
             <div className={styles.iconWrapper}>
               <Image
                 src='/icons/nearMe.svg'
@@ -95,7 +93,7 @@ function CoffeeStore(props) {
                 height='24'
                 alt='near me icon'
               />
-              <p className={styles.text}>{location.neighborhood[0]}</p>
+              <p className={styles.text}>{location.neighborhood}</p>
             </div>
           )}
           <div className={styles.iconWrapper}>
