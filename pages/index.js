@@ -9,6 +9,8 @@ import { useEffect } from "react";
 import axios from "axios";
 import StoresList from "../components/storesList";
 import { useTrackLocation } from "../hooks/use-track-location";
+import { useDispatch, useSelector } from "react-redux";
+import { setLatLong, getCoffeeStores } from "../redux/coffeeStoreSlice";
 
 export async function getStaticProps(context) {
   const coffeeStores = await fectchCoffeSTores();
@@ -20,14 +22,22 @@ export async function getStaticProps(context) {
 }
 
 export default function Home(props) {
-  const [coffeeStores, setCoffeStores] = useState("");
+  // const [coffeeStores, setCoffeStores] = useState("");
+
+  const latLong = useSelector((state) => state.coffeeStore.latLong);
+  const coffeeStoresData = useSelector(
+    (state) => state.coffeeStore.coffeeStoresData
+  );
+
+  const dispatch = useDispatch();
+
   //Custom hook
-  const { tracLocationHandler, locationErrMsg, latLong, loading } =
-    useTrackLocation();
+  const { tracLocationHandler, locationErrMsg, loading } = useTrackLocation();
+  console.log("🚀 ~ file: index.js ~ line 36 ~ Home ~ loading", loading);
 
   useEffect(async () => {
     const fetchedStores = await fectchCoffeSTores(latLong, 15);
-    setCoffeStores(fetchedStores);
+    dispatch(getCoffeeStores(fetchedStores));
   }, [latLong]);
 
   const handleOnBannerBtnClick = () => {
@@ -53,7 +63,7 @@ export default function Home(props) {
         </div>
         {latLong && (
           <StoresList
-            coffeeStores={coffeeStores}
+            coffeeStores={coffeeStoresData}
             title='Nearby Coffee Stores '
           />
         )}
