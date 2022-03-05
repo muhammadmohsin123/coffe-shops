@@ -13,7 +13,7 @@ import { fectchCoffeSTores } from "../../lib/coffeSore";
 export async function getStaticProps(context) {
   const params = context.params;
   const coffeeStores = await fectchCoffeSTores();
-  console.log("");
+
   return {
     props: {
       coffeeStore: coffeeStores.find(

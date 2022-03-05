@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import Head from "next/head";
 import Image from "next/image";
 import Banner from "../components/banner";
@@ -7,7 +7,7 @@ import styles from "../styles/Home.module.css";
 import { fectchCoffeSTores } from "../lib/coffeSore";
 import { useEffect } from "react";
 import axios from "axios";
-
+import StoresList from "../components/storesList";
 import { useTrackLocation } from "../hooks/use-track-location";
 
 export async function getStaticProps(context) {
@@ -20,20 +20,18 @@ export async function getStaticProps(context) {
 }
 
 export default function Home(props) {
+  const [coffeeStores, setCoffeStores] = useState("");
   //Custom hook
   const { tracLocationHandler, locationErrMsg, latLong, loading } =
     useTrackLocation();
 
   useEffect(async () => {
-    const fetchedStores = await fectchCoffeSTores(latLong, 30);
-    console.log("🚀 ~ file: index.js ~ line 30 ~ useEffect ~ fetchedStores", {
-      fetchedStores,
-    });
+    const fetchedStores = await fectchCoffeSTores(latLong, 15);
+    setCoffeStores(fetchedStores);
   }, [latLong]);
 
   const handleOnBannerBtnClick = () => {
     tracLocationHandler();
-    console.log("button clicked");
   };
 
   return (
@@ -53,27 +51,16 @@ export default function Home(props) {
         <div className={styles.heroImage}>
           <Image src='/static/hero-image.png' width={700} height={400} />
         </div>
-        {props.coffeeStores?.length > 0 && (
-          <>
-            <h2 className={styles.heading2}>Toronto coffee stores</h2>
-            <div className={styles.cardLayout}>
-              {props.coffeeStores.map((item) => {
-                return (
-                  <Crad
-                    key={item.fsq_id}
-                    name={item.name}
-                    imgUrl={
-                      item.imgUrl ||
-                      "https://images.unsplash.com/photo-1504753793650-d4a2b783c15e?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=2000&q=80"
-                    }
-                    href={`/coffee-store/${item.fsq_id}`}
-                    className={styles.card}
-                  />
-                );
-              })}
-            </div>{" "}
-          </>
+        {latLong && (
+          <StoresList
+            coffeeStores={coffeeStores}
+            title='Nearby Coffee Stores '
+          />
         )}
+        <StoresList
+          coffeeStores={props.coffeeStores}
+          title='Toronto Coffee Stores '
+        />
       </main>
     </div>
   );
