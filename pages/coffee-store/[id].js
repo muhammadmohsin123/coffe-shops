@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
 
@@ -8,43 +8,71 @@ import Image from "next/image";
 import cls from "classnames";
 import axios from "axios";
 import { fectchCoffeSTores } from "../../lib/coffeSore";
+import { useDispatch, useSelector } from "react-redux";
+import { setLatLong, getCoffeeStores } from "../../redux/coffeeStoreSlice";
+import { isEmpty } from "../../utils";
 ////
 
-export async function getStaticProps(context) {
-  const params = context.params;
-  const coffeeStores = await fectchCoffeSTores();
+export async function getStaticProps(staticProps) {
+  const params = staticProps.params;
 
+  const coffeeStores = await fectchCoffeSTores();
+  const findCoffeeStoreById = coffeeStores.find((coffeeStore) => {
+    return coffeeStore.fsq_id.toString() === params.id; //dynamic id
+  });
   return {
     props: {
-      coffeeStore: coffeeStores.find(
-        (item) => item.fsq_id.toString() === params.id
-      ),
-    }, // will be passed to the page component as props
+      coffeeStore: findCoffeeStoreById ? findCoffeeStoreById : {},
+    },
   };
 }
-/////
+
 export async function getStaticPaths() {
   const coffeeStores = await fectchCoffeSTores();
-  const paths = coffeeStores.map((item) => ({
-    params: { id: item.fsq_id.toString() },
-  }));
+  const paths = coffeeStores.map((coffeeStore) => {
+    return {
+      params: {
+        id: coffeeStore.fsq_id.toString(),
+      },
+    };
+  });
   return {
     paths,
-    fallback: true, // false or 'blocking'
+    fallback: true,
   };
 }
 
 /////
 
-function CoffeeStore(props) {
+function CoffeeStore(initialProps) {
+  const [coffeeStore, setCoffeeStore] = useState(
+    initialProps.coffeeStore || {}
+  );
   const router = useRouter();
-  // first time data needs to chached first and then serverd..so loading is needed
-  // it checks fallbback in getStaticPaths
+  const id = router.query.id;
+  const coffeeStores = useSelector(
+    (state) => state.coffeeStore.coffeeStoresData
+  );
   if (router.isFallback) {
     return <div>Loading....</div>;
   }
-  const { name, location, id, imgUrl } = props.coffeeStore;
-  console.log("props.coffeeStore", props.coffeeStore);
+
+  // first time data needs to chached first and then serverd..so loading is needed
+  // it checks fallbback in getStaticPaths
+
+  const { name, location, imgUrl } = coffeeStore;
+
+  useEffect(() => {
+    if (isEmpty(initialProps.coffeeStore)) {
+      if (coffeeStores.length > 0) {
+        const findCoffeeStoreById = coffeeStores.find(
+          (item) => item.fsq_id.toString() === id
+        );
+        setCoffeeStore(findCoffeeStoreById);
+      }
+    }
+  }, [id]);
+
   useEffect(async () => {}, []);
   const handleUpvoteButton = () => {
     console.log("up vote");
@@ -83,9 +111,9 @@ function CoffeeStore(props) {
               height='24'
               alt='places icon'
             />
-            <p className={styles.text}>{location.address}</p>
+            <p className={styles.text}>{location?.address}</p>
           </div>
-          {location.neighborhood?.length > 0 && (
+          {location?.neighborhood?.length > 0 && (
             <div className={styles.iconWrapper}>
               <Image
                 src='/icons/nearMe.svg'
