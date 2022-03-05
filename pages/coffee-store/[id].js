@@ -18,7 +18,7 @@ export async function getStaticProps(staticProps) {
 
   const coffeeStores = await fectchCoffeSTores();
   const findCoffeeStoreById = coffeeStores.find((coffeeStore) => {
-    return coffeeStore.fsq_id.toString() === params.id; //dynamic id
+    return coffeeStore.id.toString() === params.id; //dynamic id
   });
   return {
     props: {
@@ -32,7 +32,7 @@ export async function getStaticPaths() {
   const paths = coffeeStores.map((coffeeStore) => {
     return {
       params: {
-        id: coffeeStore.fsq_id.toString(),
+        id: coffeeStore.id.toString(),
       },
     };
   });
@@ -60,13 +60,13 @@ function CoffeeStore(initialProps) {
   // first time data needs to chached first and then serverd..so loading is needed
   // it checks fallbback in getStaticPaths
 
-  const { name, location, imgUrl } = coffeeStore;
+  const { name, neighbourhood, address, imgUrl } = coffeeStore;
 
   useEffect(() => {
     if (isEmpty(initialProps.coffeeStore)) {
       if (coffeeStores.length > 0) {
         const findCoffeeStoreById = coffeeStores.find(
-          (item) => item.fsq_id.toString() === id
+          (item) => item.id.toString() === id
         );
         setCoffeeStore(findCoffeeStoreById);
       }
@@ -111,9 +111,9 @@ function CoffeeStore(initialProps) {
               height='24'
               alt='places icon'
             />
-            <p className={styles.text}>{location?.address}</p>
+            <p className={styles.text}>{address}</p>
           </div>
-          {location?.neighborhood?.length > 0 && (
+          {neighbourhood && (
             <div className={styles.iconWrapper}>
               <Image
                 src='/icons/nearMe.svg'
@@ -121,7 +121,7 @@ function CoffeeStore(initialProps) {
                 height='24'
                 alt='near me icon'
               />
-              <p className={styles.text}>{location.neighborhood}</p>
+              <p className={styles.text}>{neighbourhood}</p>
             </div>
           )}
           <div className={styles.iconWrapper}>
