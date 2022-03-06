@@ -29,4 +29,4 @@ function StoresList({ coffeeStores, title }) {
   );
 }
 
-export default StoresList;
+export default React.memo(StoresList);

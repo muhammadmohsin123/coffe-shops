@@ -33,7 +33,6 @@ export default function Home(props) {
 
   //Custom hook
   const { tracLocationHandler, locationErrMsg, loading } = useTrackLocation();
-  console.log("🚀 ~ file: index.js ~ line 36 ~ Home ~ loading", loading);
 
   useEffect(async () => {
     const fetchedStores = await fectchCoffeSTores(latLong, 15);
